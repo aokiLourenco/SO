@@ -1,0 +1,43 @@
+The number of lines of text that appear in the output (terminal screen) after executing the program is different. Why?
+R: Devido à função pfork() que cria um processo child exatamente igual ao processo parent
+
+In this program there are 2 processes involved. Which process is responsible for each line
+of text that appears in the output? Use the values of PID and PPID to get to the answer.
+R: PID = 12787, PPID = 11975 -> process parent
+   PID = 12787, PPID = 11975 -> process parent
+   PID = 12788, PPID = 12787 -> process child
+
+Message “Was I printed by the parent or by the child process? How can I know it?”
+appears twice. Can you say which process print each one of them?
+R: Não podemos saber
+
+Edit program fork1.cpp, change the second argument of the bwRandomDelay function to
+2000, save the changes, recompile and try to answer again the previous questions. Run it
+more than once.
+R:  aoki@pop-os:~/UA/ano3/sem1/SO/SO-P/02-1-processes/code$ ./fork1
+        Before the fork:
+            PID = 13432, PPID = 11975
+        After the fork:
+            PID = 13432, PPID = 11975
+        After the fork:
+            Was I printed by the parent or by the child process? How can I know it?
+            PID = 13433, PPID = 13432
+            Was I printed by the parent or by the child process? How can I know it?
+    aoki@pop-os:~/UA/ano3/sem1/SO/SO-P/02-1-processes/code$ ./fork1
+        Before the fork:
+            PID = 13458, PPID = 11975
+        After the fork:
+            PID = 13458, PPID = 11975
+            Was I printed by the parent or by the child process? How can I know it?
+        After the fork:
+            PID = 13459, PPID = 13458
+            Was I printed by the parent or by the child process? How can I know it?
+    aoki@pop-os:~/UA/ano3/sem1/SO/SO-P/02-1-processes/code$ ./fork1
+        Before the fork:
+            PID = 13460, PPID = 11975
+        After the fork:
+            PID = 13460, PPID = 11975
+        After the fork:
+            Was I printed by the parent or by the child process? How can I know it?
+            PID = 13461, PPID = 13460
+            Was I printed by the parent or by the child process? How can I know it?
