@@ -5,7 +5,7 @@ LDFLAGS = -pthread -lm
 
 .PHONY:	all clean cleanall
 
-TARGETS = fork1 fork2 fork3 fork4 child sig1 sig2 kysnigger
+TARGETS = fork1 fork2 fork3 fork4 child sig1 sig2 teste
 
 all:	$(TARGETS)
 
