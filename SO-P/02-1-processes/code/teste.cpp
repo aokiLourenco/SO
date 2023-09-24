@@ -12,7 +12,7 @@ int main (void)
 
     pid_t ret = pfork();
     
-    if (ret != 0)
+    if (ret == 0)
     {
         for (int i = 1; i<=10; i++)
         {
@@ -22,6 +22,7 @@ int main (void)
     } else { // counter from 10 to 20
         for (int i = 1; i<=10; i++)
         {
+            usleep(200000);
             printf("%d, PID = %d, PPID = %d\n", counter+10, getpid(), getppid());
             counter++;
         }
