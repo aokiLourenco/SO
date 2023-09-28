@@ -28,30 +28,36 @@ int main (void)
     
     data -> pcounter = 1;
 
+    int input;
+        
+    printf("Value [10, 20]: ");
+    scanf("%d", &input);
+    
+    if (input < 10 || input > 20) {
+        printf("Error: input out of range [10, 20]");
+        exit(EXIT_FAILURE);
+    }
+
     pid_t ret = pfork();
     
     if (ret == -1) {
+
         perror("pfork");
         exit(EXIT_FAILURE);
-    }else if (ret == 0) {
 
-        int input;
-        do {
-            printf("Value [10, 20]: ");
-            scanf("%d", &input);
-        } while (input < 10 || input > 20);
+    } else if (ret == 0) {
         
-
-        for (int i = 1; i<=input; i++)
+        for (int i = 1; i<input; i++)
         {
-            printf("%d, (%d)", data->pcounter, getpid());
+            printf("%d, (%d)\n", data->pcounter, getpid());
             data->pcounter++;
         }
-    } else { // counter from 10 to 20
+
+    } else {
         usleep(200000);
 
-        while (data -> pcounter < 10) {
-            printf("%d, (%d)", data->pcounter, getpid());
+        for (int i = 0; i < input; i++) {
+            printf("%d, (%d)\n", data->pcounter, getpid());
             data->pcounter--;
         }
 
