@@ -5,6 +5,9 @@
 static void print_pfifo(PriorityFIFO* pfifo);
 static int empty_pfifo(PriorityFIFO* pfifo);
 static int full_pfifo(PriorityFIFO* pfifo);
+static pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
+static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+
 
 // TODO point: initialization changes may be required in this function
 void init_pfifo(PriorityFIFO* pfifo)
@@ -34,6 +37,7 @@ void insert_pfifo(PriorityFIFO* pfifo, int id, int priority)
    require (priority > 0 && priority <= MAX_PRIORITY, "invalid priority value");  // a false value indicates a program error
    require (!full_pfifo(pfifo), "full FIFO");  // IMPORTANT: in a shared fifo, it may not result from a program error!
 
+   pthread_mutex_lock(&mutex);
    //printf("[insert_pfifo] value=%d, priority=%d, pfifo->inp=%d, pfifo->out=%d\n", id, priority, pfifo->inp, pfifo->out);
 
    int idx = pfifo->inp;
@@ -45,6 +49,8 @@ void insert_pfifo(PriorityFIFO* pfifo, int id, int priority)
       idx = prev;
       prev = (idx + FIFO_MAXSIZE - 1) % FIFO_MAXSIZE;
    }
+
+   pthread_mutex_unlock(&mutex);
    //printf("[insert_pfifo] idx=%d, prev=%d\n", idx, prev);
    pfifo->array[idx].id = id;
    pfifo->array[idx].priority = priority;

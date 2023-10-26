@@ -172,6 +172,27 @@ void patient_life(int id)
 
 // TODO point: if necessary, add extra functions here:
 
+void* main_doctor(void* arg)
+{
+   int id = (intptr_t)arg;
+   while(doctor_iteration(id) == 0);
+   return NULL;
+}
+
+void* main_patient(void* arg)
+{
+   int id = (intptr_t)arg;
+   patient_life(id);
+   return NULL;
+}
+
+void* main_nurse(void* arg)
+{
+   int id = (intptr_t)arg;
+   while(nurse_iteration(id) == 0);
+   return NULL;
+}
+
 /* ************************************************* */
 
 int main(int argc, char *argv[])

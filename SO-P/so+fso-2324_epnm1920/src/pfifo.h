@@ -19,7 +19,7 @@
 #include  "settings.h"
 
 // TODO point: uncomment the desired implementation
-//#include "thread.h"
+#include "thread.h"
 //#include "process.h"
 
 typedef struct
@@ -32,6 +32,8 @@ typedef struct
    int inp;  ///< point of insertion (queue tail)
    int out;  ///< point of retrieval (queue head)
    int cnt;  ///< number of items stored
+   static pthread_cond_t cond;
+   static pthread_mutex_t mutex;
    // TODO point: if necessary, add synchronization declarations here
 } PriorityFIFO;
 

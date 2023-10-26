@@ -1,11 +1,18 @@
 SO: Training exam
 
 (I) Identificar Entidades Ativas
-    patient, nurse, doctor
+    patient, nurse, doctor (2º) Lançar Entidades Ativas
 
 (II) Partilha memória
-    Fila de triagem, Fila de espera -> pfifo
+    Fila de triagem, Fila de espera -> pfifo(6/8 valores) (1º)
 
+
+(III) Comunicação direta entre exam
+     (3º)  doctor              --------->    patient(uma variável por paciente)
+           semáfro:up                        semáfro:down
+           var_condicao:broadcast            var_condicao:cond_wait 
+
+(4º)Terminação
 
 
 Lock                                  |
@@ -13,4 +20,4 @@ while wait                            |
 
 
 broadcast                             |
-unlock                                |
+unlock                                | 
