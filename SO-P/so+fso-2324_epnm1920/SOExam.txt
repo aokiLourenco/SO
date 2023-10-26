@@ -1,0 +1,16 @@
+SO: Training exam
+
+(I) Identificar Entidades Ativas
+    patient, nurse, doctor
+
+(II) Partilha memória
+    Fila de triagem, Fila de espera -> pfifo
+
+
+
+Lock                                  |
+while wait                            |
+
+
+broadcast                             |
+unlock                                |
