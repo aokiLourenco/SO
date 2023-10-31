@@ -33,9 +33,9 @@ typedef struct
    int inp;  ///< point of insertion (queue tail)
    int out;  ///< point of retrieval (queue head)
    int cnt;  ///< number of items stored
-   static pthread_cond_t not_full;
-   static pthread_cond_t not_empty;
-   static pthread_mutex_t access;
+   pthread_cond_t not_full;
+   pthread_cond_t not_empty;
+   pthread_mutex_t mutex;
 
    // TODO point: if necessary, add synchronization declarations here
 } PriorityFIFO;
@@ -44,8 +44,6 @@ void init_pfifo(PriorityFIFO* pfifo);
 void term_pfifo(PriorityFIFO* pfifo);
 void insert_pfifo(PriorityFIFO* pfifo, int id, int priority);
 int retrieve_pfifo(PriorityFIFO* pfifo);
-int full_fifo(PriorityFIFO* pfifo);
-int empty_fifo(PriorityFIFO* pfifo);
 
 
 #endif
