@@ -70,8 +70,8 @@ HospitalData * hd = NULL;
  *  \brief verification tests:
  */
 #define check_valid_patient(id) do { check_valid_patient_id(id); check_valid_name(hd->all_patients[id].name); } while(0)
-#define check_valid_nurse(id) do { check_valid_nurse_id(id); } while(0)    // ! I think I can delete this
-#define check_valid_doctor(id) do { check_valid_doctor_id(id); } while(0)  // ! I think I can delete this
+#define check_valid_nurse(id) do { check_valid_nurse_id(id); } while(0)    
+#define check_valid_doctor(id) do { check_valid_doctor_id(id); } while(0)  
    
 int random_manchester_triage_priority();
 void new_patient(Patient* patient); // initializes a new patient
@@ -196,6 +196,15 @@ void* patient_thread(void* arg)
    return NULL;
 }
 
+void* doctor_thread(void* arg)
+{
+   int id = *((int *) arg);
+   int return_code = 0;
+   while(return_code == 0)
+      return_code = doctor_iteration(id);
+   return NULL;
+}
+
 void* nurse_thread(void* arg)
 {
    int id = *((int *) arg);
@@ -205,14 +214,7 @@ void* nurse_thread(void* arg)
    return NULL;
 }
 
-void* doctor_thread(void* arg)
-{
-   int id = *((int *) arg);
-   int return_code = 0;
-   while(return_code == 0)
-      return_code = doctor_iteration(id);
-   return NULL;
-}
+
 /* ************************************************* */
 
 int main(int argc, char *argv[])
@@ -272,7 +274,7 @@ int main(int argc, char *argv[])
    for(int i=0; i < npatients; i++)
    {
       patient_ids[i] = i;
-      thread_create(&all_patients[i], NULL, doctor_thread, (void*)&patient_ids[i]);
+      thread_create(&all_patients[i], NULL, patient_thread, (void*)&patient_ids[i]);
    }
 
    pthread_t all_doctors[ndoctors];
@@ -288,7 +290,7 @@ int main(int argc, char *argv[])
    for(int i=0; i < nnurses; i++)
    {
       nurse_ids[i] = i;
-      thread_create(&all_nurses[i], NULL, doctor_thread, (void*)&nurse_ids[i]);
+      thread_create(&all_nurses[i], NULL, nurse_thread, (void*)&nurse_ids[i]);
    }
 
    for (int i = 0; i < npatients; i++)

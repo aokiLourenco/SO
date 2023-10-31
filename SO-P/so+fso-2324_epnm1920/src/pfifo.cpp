@@ -5,8 +5,6 @@
 static void print_pfifo(PriorityFIFO* pfifo);
 static int empty_pfifo(PriorityFIFO* pfifo);
 static int full_pfifo(PriorityFIFO* pfifo);
-static pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
-static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
 
 // TODO point: initialization changes may be required in this function
