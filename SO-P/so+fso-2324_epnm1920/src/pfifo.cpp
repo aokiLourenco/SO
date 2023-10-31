@@ -14,18 +14,15 @@ static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 void init_pfifo(PriorityFIFO* pfifo)
 {
    // Initialize mutex and condition variables
-   mutex_init(&pfifo->access, NULL);
-   cond_init(&pfifo->not_full, NULL);
-   cond_init(&pfifo->not_empty, NULL);
-
-   mutex_lock(&pfifo->access);
    require (pfifo != NULL, "NULL pointer to FIFO");  // a false value indicates a program error
-
+   
    memset(pfifo->array, 0, sizeof(pfifo->array));
    pfifo->inp = pfifo->out = pfifo->cnt = 0;
 
-   cond_broadcast(&pfifo->not_full);
-   mutex_unlock(&pfifo->access);
+   mutex_init(&pfifo->mutex, NULL);
+   cond_init(&pfifo->not_full, NULL);
+   cond_init(&pfifo->not_empty, NULL);
+
 }
 
 /* --------------------------------------- */
@@ -35,6 +32,9 @@ void term_pfifo(PriorityFIFO* pfifo)
 {
    require (pfifo != NULL, "NULL pointer to FIFO");  // a false value indicates a program error
 
+   mutex_destroy(&pfifo->mutex);
+   cond_destroy(&pfifo->not_full);
+   cond_destroy(&pfifo->not_empty);
 }
 
 /* --------------------------------------- */
@@ -43,17 +43,17 @@ void term_pfifo(PriorityFIFO* pfifo)
 // * DONE
 void insert_pfifo(PriorityFIFO* pfifo, int id, int priority)
 {
-   mutex_lock(&pfifo->access);
 
    require (pfifo != NULL, "NULL pointer to FIFO");  // a false value indicates a program error
    require ((id >= 0 && id <= MAX_ID) || id == DUMMY_ID, "invalid id");  // a false value indicates a program error
    require (priority > 0 && priority <= MAX_PRIORITY, "invalid priority value");  // a false value indicates a program error
 
+   mutex_lock(&pfifo->mutex);
    while(full_pfifo(pfifo))
    {
-      cond_wait(&pfifo->not_full, &pfifo->access);
+      cond_wait(&pfifo->not_full, &pfifo->mutex);
    }
-
+   
    require (!full_pfifo(pfifo), "full FIFO");  // IMPORTANT: in a shared fifo, it may not result from a program error!
 
    //printf("[insert_pfifo] value=%d, priority=%d, pfifo->inp=%d, pfifo->out=%d\n", id, priority, pfifo->inp, pfifo->out);
@@ -74,7 +74,7 @@ void insert_pfifo(PriorityFIFO* pfifo, int id, int priority)
    pfifo->cnt++;
    //printf("[insert_pfifo] pfifo->inp=%d, pfifo->out=%d\n", pfifo->inp, pfifo->out);
    cond_broadcast(&pfifo->not_empty);
-   mutex_unlock(&pfifo->access);
+   mutex_unlock(&pfifo->mutex);
 }
 
 /* --------------------------------------- */
@@ -83,17 +83,18 @@ void insert_pfifo(PriorityFIFO* pfifo, int id, int priority)
 // * DONE
 int retrieve_pfifo(PriorityFIFO* pfifo)
 {
-   //!LOCK-------------
-   mutex_lock(&pfifo->access);
 
    require (pfifo != NULL, "NULL pointer to FIFO");   // a false value indicates a program error
 
    // * while empty wait -> se tenho wait tenho de ter broadcast
    // * not empty / not full
+   //!LOCK-------------
+   mutex_lock(&pfifo->mutex);
    while(empty_pfifo(pfifo))
    {
-      cond_wait(&pfifo->not_empty, &pfifo->access);
+      cond_wait(&pfifo->not_empty, &pfifo->mutex);
    }
+   require(!empty_pfifo(pfifo), "empty fifo");
 
    check_valid_patient_id(pfifo->array[pfifo->out].id);
    check_valid_priority(pfifo->array[pfifo->out].priority);
@@ -115,9 +116,10 @@ int retrieve_pfifo(PriorityFIFO* pfifo)
    }
 
    ensure ((result >= 0 && result <= MAX_ID) || result == DUMMY_ID, "invalid id");  // a false value indicates a program error
+
    cond_broadcast(&pfifo->not_full);
    //!UNLOCK------------
-   mutex_unlock(&pfifo->access);
+   mutex_unlock(&pfifo->mutex);
    return result;
 }
 
